@@ -1,7 +1,7 @@
 """Helper functions for working with version control systems."""
 import logging
 import os
-import subprocess
+import subprocess  # nosec
 from shutil import which
 
 from cookiecutter.exceptions import (
@@ -81,7 +81,7 @@ def clone(repo_url, checkout=None, clone_to_dir='.', no_input=False):
     if repo_type == 'git':
         repo_name = repo_name.split(':')[-1].rsplit('.git')[0]
         repo_dir = os.path.normpath(os.path.join(clone_to_dir, repo_name))
-    elif repo_type == 'hg':
+    if repo_type == 'hg':
         repo_dir = os.path.normpath(os.path.join(clone_to_dir, repo_name))
     logger.debug('repo_dir is {0}'.format(repo_dir))
 
@@ -92,13 +92,13 @@ def clone(repo_url, checkout=None, clone_to_dir='.', no_input=False):
 
     if clone:
         try:
-            subprocess.check_output(
+            subprocess.check_output(  # nosec
                 [repo_type, 'clone', repo_url],
                 cwd=clone_to_dir,
                 stderr=subprocess.STDOUT,
             )
             if checkout is not None:
-                subprocess.check_output(
+                subprocess.check_output(  # nosec
                     [repo_type, 'checkout', checkout],
                     cwd=repo_dir,
                     stderr=subprocess.STDOUT,
@@ -115,6 +115,7 @@ def clone(repo_url, checkout=None, clone_to_dir='.', no_input=False):
                     'The {} branch of repository {} could not found, '
                     'have you made a typo?'.format(checkout, repo_url)
                 )
+            logger.error('git clone failed with error: %s', output)
             raise
 
     return repo_dir
